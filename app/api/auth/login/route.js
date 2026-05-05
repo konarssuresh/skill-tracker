@@ -33,7 +33,10 @@ export const POST = async (req) => {
       },
     );
 
-    response.cookies.set("token", token);
+    response.cookies.set("token", token, {
+      secure: true,
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
 
     return response;
   } catch (e) {
