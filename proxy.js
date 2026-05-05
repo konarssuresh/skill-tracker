@@ -13,7 +13,7 @@ export async function proxy(req) {
   );
 
   if (isAuthNeededApi) {
-    const { isValid, message = "", user } = await validateUser();
+    const { isValid, message = "", user } = await validateUser(req);
     if (!isValid) {
       return NextResponse.json({ success: false, message }, { status: 400 });
     }
@@ -21,7 +21,7 @@ export async function proxy(req) {
   }
 
   if (isUIAuthNeededRoute) {
-    const { isValid, message = "", user } = await validateUser();
+    const { isValid } = await validateUser(req);
     if (!isValid) {
       return NextResponse.redirect(new URL("/auth/login", req.url));
     }

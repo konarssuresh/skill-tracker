@@ -1,5 +1,6 @@
 import connectDb from "@/utils/init-db";
 import User from "@/models/user";
+import { getPublicUser } from "@/utils/auth";
 import { validateSignupReq } from "@/utils/validator";
 import { NextResponse } from "next/server";
 
@@ -12,23 +13,20 @@ export async function POST(request) {
     const { fullName, email, password } = body;
     const user = new User({
       fullName,
-      email,
+      email: email.toLowerCase(),
       password,
     });
-
-    await user.hashPassword();
 
     const res = await user.save();
     return NextResponse.json(
       {
         created: true,
         error: false,
-        data: res,
+        data: getPublicUser(res),
       },
       { status: 201 },
     );
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       {
         created: false,

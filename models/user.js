@@ -1,7 +1,25 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { buildAuthToken } from "@/utils/auth";
+
+const userPreferencesSchema = new mongoose.Schema(
+  {
+    theme: {
+      type: String,
+      enum: ["system", "light", "dark"],
+      default: "system",
+    },
+    dashboardLayout: {
+      type: String,
+      enum: ["featured-skill"],
+      default: "featured-skill",
+    },
+  },
+  {
+    _id: false,
+  },
+);
 
 const userSchema = new mongoose.Schema(
   {
@@ -25,41 +43,69 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
+      minlength: [8, "Password must be at least 8 characters long"],
+      select: false,
     },
     verified: {
       type: Boolean,
       default: false,
     },
+    timezone: {
+      type: String,
+      default: "UTC",
+      trim: true,
+      maxlength: [100, "Timezone cannot be more than 100 characters"],
+    },
+    preferences: {
+      type: userPreferencesSchema,
+      default: () => ({}),
+    },
   },
   {
     timestamps: true,
+    toJSON: {
+      transform: (_doc, ret) => {
+        ret.id = ret._id.toString();
+        delete ret._id;
+        delete ret.password;
+        delete ret.__v;
+        return ret;
+      },
+    },
   },
 );
 
-userSchema.methods.hashPassword = async function () {
-  let user = this;
-  let passwordHash = await bcrypt.hash(user.password, 10);
-  user.password = passwordHash;
-};
+userSchema.index({ email: 1 }, { unique: true });
+
+userSchema.pre("save", async function hashPasswordBeforeSave(next) {
+  if (!this.isModified("password")) {
+    next();
+    return;
+  }
+
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  const user = this;
-  const isValid = await bcrypt.compare(candidatePassword, user.password);
-  return isValid;
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
 userSchema.methods.generateAuthToken = function () {
-  const user = this;
-  const token = jwt.sign(
-    {
-      _id: user._id.toString(),
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "7d",
-    },
-  );
-  return token;
+  return buildAuthToken(this);
+};
+
+userSchema.methods.toSafeObject = function () {
+  return {
+    id: this._id.toString(),
+    fullName: this.fullName,
+    email: this.email,
+    verified: this.verified,
+    timezone: this.timezone,
+    preferences: this.preferences,
+    createdAt: this.createdAt,
+    updatedAt: this.updatedAt,
+  };
 };
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);

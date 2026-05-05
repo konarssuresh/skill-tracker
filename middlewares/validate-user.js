@@ -1,26 +1,41 @@
 import connectDb from "@/utils/init-db";
 import User from "@/models/user";
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
+import { AUTH_COOKIE_NAME, verifyAuthToken } from "@/utils/auth";
 
-export const validateUser = async () => {
+const getRequestToken = async (request) => {
+  if (request?.cookies) {
+    return request.cookies.get(AUTH_COOKIE_NAME)?.value ?? null;
+  }
+
   const store = await cookies();
-  const token = store.get("token");
+  return store.get(AUTH_COOKIE_NAME)?.value ?? null;
+};
 
-  if (!token || !token?.value) {
+export const validateUser = async (request) => {
+  const token = await getRequestToken(request);
+
+  if (!token) {
     return { isValid: false, message: "missing token" };
   }
 
-  const { _id } = jwt.verify(token?.value, process.env.JWT_SECRET);
+  try {
+    const payload = verifyAuthToken(token);
 
-  const user = await User.findById(_id);
+    await connectDb();
+    const user = await User.findById(payload.sub);
 
-  if (!user) {
-    return { isValid: false, message: "missing user" };
+    if (!user) {
+      return { isValid: false, message: "missing user" };
+    }
+
+    return {
+      isValid: true,
+      user,
+      token,
+      payload,
+    };
+  } catch {
+    return { isValid: false, message: "invalid token" };
   }
-
-  return {
-    isValid: true,
-    user,
-  };
 };

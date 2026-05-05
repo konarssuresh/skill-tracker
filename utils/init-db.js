@@ -1,15 +1,30 @@
 import mongoose from "mongoose";
 
-let mongoInstance;
+const MONGO_URI = process.env.MONGO_URI;
+
+if (!MONGO_URI) {
+  throw new Error("MONGO_URI is not configured");
+}
+
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
 
 const connectDb = async () => {
-  try {
-    if (mongoInstance) {
-      return mongoInstance;
-    }
+  if (cached.conn) {
+    return cached.conn;
+  }
 
-    mongoInstance = await mongoose.connect(process.env.MONGO_URI);
-  } catch (e) {}
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGO_URI, {
+      bufferCommands: false,
+    });
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
 };
 
 export default connectDb;

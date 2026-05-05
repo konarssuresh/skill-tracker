@@ -56,18 +56,7 @@ export const validateLoginRequest = (req) => {
     throw new Error("A valid email is required");
   }
 
-  if (
-    !password ||
-    !validator.isStrongPassword(password, {
-      minLength: 8,
-      minLowercase: 1,
-      minUppercase: 1,
-      minNumbers: 1,
-      minSymbols: 1,
-    })
-  ) {
-    throw new Error(
-      "Password must be at least 8 characters long and include uppercase, lowercase, number, and symbol",
-    );
+  if (!password || validator.isEmpty(password)) {
+    throw new Error("Password is required");
   }
 };

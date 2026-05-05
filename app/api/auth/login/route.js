@@ -1,6 +1,11 @@
 import User from "@/models/user";
 import connectDb from "@/utils/init-db";
 import { validateLoginRequest } from "@/utils/validator";
+import {
+  AUTH_COOKIE_NAME,
+  getAuthCookieOptions,
+  getPublicUser,
+} from "@/utils/auth";
 import { NextResponse } from "next/server";
 
 export const POST = async (req) => {
@@ -10,7 +15,9 @@ export const POST = async (req) => {
     validateLoginRequest(body);
     const { email, password } = body;
 
-    const savedUser = await User.findOne({ email });
+    const savedUser = await User.findOne({ email: email.toLowerCase() }).select(
+      "+password",
+    );
     if (!savedUser) {
       throw new Error("Combination of email and password is not matching");
     }
@@ -22,28 +29,31 @@ export const POST = async (req) => {
 
     const token = savedUser.generateAuthToken();
 
-    let response = NextResponse.json(
+    const response = NextResponse.json(
       {
         loggedIn: true,
         error: false,
-        message: "login successful",
+        message: "Login successful",
+        user: getPublicUser(savedUser),
       },
       {
         status: 200,
       },
     );
 
-    response.cookies.set("token", token, {
-      secure: true,
-      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    });
+    response.cookies.set(AUTH_COOKIE_NAME, token, getAuthCookieOptions());
 
     return response;
   } catch (e) {
-    return NextResponse.json({
-      loggedIn: false,
-      error: true,
-      message: e?.message || "Something went wrong",
-    });
+    return NextResponse.json(
+      {
+        loggedIn: false,
+        error: true,
+        message: e?.message || "Something went wrong",
+      },
+      {
+        status: 400,
+      },
+    );
   }
 };
