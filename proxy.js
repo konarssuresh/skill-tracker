@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { validateUser } from "@/middlewares/validate-user";
 
 const AUTH_NEEDED_URL = ["skills"];
