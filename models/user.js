@@ -94,15 +94,17 @@ userSchema.methods.generateAuthToken = function () {
 };
 
 userSchema.methods.toSafeObject = function () {
+  const serialized = this.toJSON();
+
   return {
-    id: this._id.toString(),
-    fullName: this.fullName,
-    email: this.email,
-    verified: this.verified,
-    timezone: this.timezone,
-    preferences: this.preferences,
-    createdAt: this.createdAt,
-    updatedAt: this.updatedAt,
+    id: serialized.id,
+    fullName: serialized.fullName,
+    email: serialized.email,
+    verified: serialized.verified,
+    timezone: serialized.timezone,
+    preferences: serialized.preferences,
+    createdAt: serialized.createdAt,
+    updatedAt: serialized.updatedAt,
   };
 };
 

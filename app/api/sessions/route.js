@@ -85,8 +85,6 @@ export async function POST(request) {
       throw new Error("Session date cannot be in the future");
     }
 
-    console.log("skill id", payload.skillId, "userid", user._id);
-
     const skill = await Skill.findOne({
       _id: payload.skillId,
       userId: user._id,

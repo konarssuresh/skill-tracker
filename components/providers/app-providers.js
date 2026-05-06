@@ -2,7 +2,10 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { MotionConfig } from "motion/react";
 import { useState } from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export function AppProviders({ children }) {
   const [queryClient] = useState(
@@ -21,9 +24,24 @@ export function AppProviders({ children }) {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <MotionConfig reducedMotion="user">
+      <QueryClientProvider client={queryClient}>
+        {children}
+        <ToastContainer
+          position="top-right"
+          autoClose={2800}
+          hideProgressBar={false}
+          newestOnTop
+          limit={3}
+          closeOnClick
+          pauseOnHover
+          draggable
+          theme="light"
+          className="skilltrack-toast-container"
+          progressClassName={() => "skilltrack-toast-progress"}
+        />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </MotionConfig>
   );
 }

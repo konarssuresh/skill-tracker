@@ -1,4 +1,7 @@
+"use client";
+
 import { forwardRef } from "react";
+import { motion } from "motion/react";
 import { cn } from "@/utils/cn";
 
 const variantClasses = {
@@ -26,9 +29,12 @@ export const Button = forwardRef(function Button(
   ref,
 ) {
   return (
-    <button
+    <motion.button
       ref={ref}
       type={type}
+      whileHover={{ y: -2, scale: 1.01 }}
+      whileTap={{ scale: 0.98, y: 0 }}
+      transition={{ type: "spring", stiffness: 320, damping: 22 }}
       className={cn(
         "inline-flex items-center justify-center rounded-lg font-semibold shadow-sm transition-all disabled:opacity-60",
         variantClasses[variant] ?? variantClasses.primary,
