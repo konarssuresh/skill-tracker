@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { validateUser } from "@/middlewares/validate-user";
 
-const AUTH_NEEDED_URL = ["skills"];
+const AUTH_NEEDED_URL = ["skills", "sessions"];
 const UI_AUTH_NEEDED_URL = ["dashboard", "settings"];
 
 export async function proxy(req) {
