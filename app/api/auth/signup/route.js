@@ -1,6 +1,10 @@
 import connectDb from "@/utils/init-db";
 import User from "@/models/user";
-import { getPublicUser } from "@/utils/auth";
+import {
+  AUTH_COOKIE_NAME,
+  getAuthCookieOptions,
+  getPublicUser,
+} from "@/utils/auth";
 import { validateSignupReq } from "@/utils/validator";
 import { NextResponse } from "next/server";
 
@@ -17,21 +21,34 @@ export async function POST(request) {
       password,
     });
 
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+
+    if (existingUser) {
+      throw new Error("An account with this email already exists");
+    }
+
     const res = await user.save();
-    return NextResponse.json(
+    const token = res.generateAuthToken();
+
+    const response = NextResponse.json(
       {
         created: true,
         error: false,
-        data: getPublicUser(res),
+        user: getPublicUser(res),
+        message: "Signup successful",
       },
       { status: 201 },
     );
+
+    response.cookies.set(AUTH_COOKIE_NAME, token, getAuthCookieOptions());
+
+    return response;
   } catch (error) {
     return NextResponse.json(
       {
         created: false,
         error: true,
-        data: error?.message || "Something went wrong",
+        message: error?.message || "Something went wrong",
       },
       {
         status: 400,

@@ -92,7 +92,7 @@ skillSchema.index({ userId: 1, normalizedName: 1 }, { unique: true });
 skillSchema.index({ userId: 1, updatedAt: -1 });
 skillSchema.index({ userId: 1, totalMinutes: -1 });
 
-skillSchema.pre("validate", function setNormalizedName(next) {
+skillSchema.pre("validate", function setNormalizedName() {
   if (this.name) {
     this.normalizedName = this.name.trim().toLowerCase();
   }
@@ -110,8 +110,6 @@ skillSchema.pre("validate", function setNormalizedName(next) {
       "Goal type is required when a target is set",
     );
   }
-
-  next();
 });
 
 const Skill = mongoose.models.Skill || mongoose.model("Skill", skillSchema);

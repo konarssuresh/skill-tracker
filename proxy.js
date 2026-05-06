@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { validateUser } from "@/middlewares/validate-user";
 
 const AUTH_NEEDED_URL = ["skills"];
-const UI_AUTH_NEEDED_URL = ["dashboard"];
+const UI_AUTH_NEEDED_URL = ["dashboard", "settings"];
 
 export async function proxy(req) {
-  const path = req.url;
+  const path = req.nextUrl.pathname;
 
   const isAuthNeededApi = AUTH_NEEDED_URL.some((route) => path.includes(route));
   const isUIAuthNeededRoute = UI_AUTH_NEEDED_URL.some((route) =>
@@ -21,8 +21,7 @@ export async function proxy(req) {
   }
 
   if (isUIAuthNeededRoute) {
-    const { isValid, message } = await validateUser(req);
-    console.log({ isValid, message });
+    const { isValid } = await validateUser(req);
     if (!isValid) {
       return NextResponse.redirect(new URL("/auth/login", req.url));
     }
@@ -32,5 +31,5 @@ export async function proxy(req) {
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/dashboard"],
+  matcher: ["/api/:path*", "/dashboard", "/settings"],
 };

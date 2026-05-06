@@ -8,22 +8,14 @@ import { useRouter } from "next/navigation";
 import { Button, Logo, TextInput } from "@/components/ui";
 import { useAuthStore } from "@/stores/auth-store";
 import { apiRequest } from "@/utils/api";
+import {
+  validateEmail,
+  validatePasswordForLogin,
+} from "@/utils/form-validation";
 
 const defaultValues = {
   email: "",
   password: "",
-};
-
-const emailRules = {
-  required: "Email is required",
-  pattern: {
-    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    message: "Enter a valid email address",
-  },
-};
-
-const passwordRules = {
-  required: "Password is required",
 };
 
 export function LoginForm() {
@@ -159,7 +151,7 @@ export function LoginForm() {
               <Controller
                 name="email"
                 control={control}
-                rules={emailRules}
+                rules={{ validate: validateEmail }}
                 render={({ field, fieldState }) => (
                   <TextInput
                     {...field}
@@ -176,7 +168,7 @@ export function LoginForm() {
               <Controller
                 name="password"
                 control={control}
-                rules={passwordRules}
+                rules={{ validate: validatePasswordForLogin }}
                 render={({ field, fieldState }) => (
                   <TextInput
                     {...field}

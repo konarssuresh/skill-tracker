@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Logo } from "@/components/ui";
 import { validateUser } from "@/middlewares/validate-user";
 
@@ -8,8 +9,16 @@ export default async function DashboardPage() {
     <main className="page-shell flex min-h-screen flex-col py-8">
       <header className="flex items-center justify-between gap-4">
         <Logo />
-        <div className="rounded-full border border-border bg-surface px-4 py-2 text-sm text-text-secondary shadow-sm">
-          {user?.email}
+        <div className="flex items-center gap-3">
+          <Link
+            href="/settings"
+            className="rounded-full border border-border bg-surface px-4 py-2 text-sm text-text-secondary shadow-sm transition-colors hover:bg-bg-secondary"
+          >
+            Settings
+          </Link>
+          <div className="rounded-full border border-border bg-surface px-4 py-2 text-sm text-text-secondary shadow-sm">
+            {user?.email}
+          </div>
         </div>
       </header>
 

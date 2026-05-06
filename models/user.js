@@ -77,14 +77,12 @@ const userSchema = new mongoose.Schema(
 
 userSchema.index({ email: 1 }, { unique: true });
 
-userSchema.pre("save", async function hashPasswordBeforeSave(next) {
+userSchema.pre("save", async function hashPasswordBeforeSave() {
   if (!this.isModified("password")) {
-    next();
     return;
   }
 
   this.password = await bcrypt.hash(this.password, 10);
-  next();
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword) {

@@ -1,7 +1,13 @@
-import React from "react";
+import { redirect } from "next/navigation";
+import { SignupForm } from "@/app/auth/signup/signup-form";
+import { validateUser } from "@/middlewares/validate-user";
 
-const Signup = () => {
-  return <div>Signup</div>;
-};
+export default async function SignupPage() {
+  const { isValid } = await validateUser();
 
-export default Signup;
+  if (isValid) {
+    redirect("/dashboard");
+  }
+
+  return <SignupForm />;
+}
