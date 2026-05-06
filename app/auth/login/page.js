@@ -1,7 +1,13 @@
-import React from "react";
+import { redirect } from "next/navigation";
+import { LoginForm } from "@/app/auth/login/login-form";
+import { validateUser } from "@/middlewares/validate-user";
 
-const Login = () => {
-  return <div>Login</div>;
-};
+export default async function LoginPage() {
+  const { isValid } = await validateUser();
 
-export default Login;
+  if (isValid) {
+    redirect("/dashboard");
+  }
+
+  return <LoginForm />;
+}

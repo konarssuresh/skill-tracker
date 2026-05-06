@@ -112,6 +112,11 @@
     cursor: not-allowed;
   }
 
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
   :focus-visible {
     outline: 3px solid color-mix(in srgb, var(--color-accent) 55%, white);
     outline-offset: 3px;

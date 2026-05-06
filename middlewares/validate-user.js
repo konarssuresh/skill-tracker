@@ -21,10 +21,8 @@ export const validateUser = async (request) => {
 
   try {
     const payload = verifyAuthToken(token);
-
     await connectDb();
-    const user = await User.findById(payload._id);
-
+    const user = await User.findById(payload._id || payload.sub);
     if (!user) {
       return { isValid: false, message: "missing user" };
     }

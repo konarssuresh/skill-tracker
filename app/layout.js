@@ -1,4 +1,5 @@
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { AppProviders } from "@/components/providers/app-providers";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -28,7 +29,7 @@ export default function RootLayout({ children }) {
       className={`${spaceGrotesk.variable} ${inter.variable} ${jetBrainsMono.variable} h-full scroll-smooth`}
     >
       <body className="min-h-full bg-bg-primary font-body text-text-primary antialiased">
-        {children}
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

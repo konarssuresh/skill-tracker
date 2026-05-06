@@ -21,7 +21,8 @@ export async function proxy(req) {
   }
 
   if (isUIAuthNeededRoute) {
-    const { isValid } = await validateUser(req);
+    const { isValid, message } = await validateUser(req);
+    console.log({ isValid, message });
     if (!isValid) {
       return NextResponse.redirect(new URL("/auth/login", req.url));
     }
